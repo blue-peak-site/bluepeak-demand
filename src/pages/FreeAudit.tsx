@@ -31,6 +31,18 @@ export default function FreeAudit() {
     specifics: '',
   });
 
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      company: '',
+      email: '',
+      city: '',
+      website: '',
+      gbp: '',
+      specifics: '',
+    });
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -72,13 +84,25 @@ export default function FreeAudit() {
       });
 
       const text = await response.text();
+      console.log('Status HTTP:', response.status);
       console.log('Resposta do Apps Script:', text);
 
-      if (!response.ok || text.trim().toLowerCase() !== 'ok') {
-        throw new Error(`Falha no envio: ${text}`);
+      let result: { ok?: boolean; error?: string; message?: string } = {};
+
+      try {
+        result = JSON.parse(text);
+      } catch {
+        throw new Error(`Resposta inválida do servidor: ${text}`);
       }
 
-      setIsSubmitted(true);
+      // Considera sucesso se o Apps Script retornou { ok: true }
+      if (result.ok === true) {
+        setIsSubmitted(true);
+        resetForm();
+        return;
+      }
+
+      throw new Error(result.error || result.message || `Falha no envio: ${text}`);
     } catch (error) {
       console.error('Erro ao enviar formulário:', error);
       alert('Erro ao enviar formulário. Verifica o console e tenta de novo.');
@@ -295,15 +319,7 @@ export default function FreeAudit() {
                     className="mt-10"
                     onClick={() => {
                       setIsSubmitted(false);
-                      setFormData({
-                        name: '',
-                        company: '',
-                        email: '',
-                        city: '',
-                        website: '',
-                        gbp: '',
-                        specifics: '',
-                      });
+                      resetForm();
                     }}
                   >
                     Submit Another Request
@@ -497,7 +513,7 @@ export default function FreeAudit() {
             </div>
           </motion.div>
         </section>
-      
+
         <section className="px-6 max-w-7xl mx-auto w-full pt-12 border-t border-white/5">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
