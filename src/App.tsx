@@ -18,7 +18,10 @@ export default function App() {
           <Route path="stormrank" element={<StormRank />} />
           <Route path="audit-example" element={<AuditExample />} />
           <Route path="storm-activation" element={<StormActivation />} />
-          <Route path="request-storm-activation" element={<RequestStormActivation />} />
+          <Route
+            path="request-storm-activation"
+            element={<RequestStormActivation />}
+          />
           <Route path="free-audit" element={<FreeAudit />} />
           <Route path="insights" element={<Insights />} />
           <Route path="insights/:slug" element={<InsightArticleTemplate />} />
